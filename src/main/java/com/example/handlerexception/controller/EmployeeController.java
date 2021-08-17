@@ -14,22 +14,28 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(name = "/employee")
+@RequestMapping(value = "/employee")
 public class EmployeeController {
 
     private final Logger logger = LoggerFactory.getLogger(EmployeeController.class);
     private final EmployeeRepository employeeRepository;
+
+    // Bad Practice, is better using low coupling, using service for other
     Employee employee = null;
     Address address = null;
-
 
     @Autowired
     public EmployeeController(EmployeeRepository employeeRepository) {
         this.employeeRepository = employeeRepository;
     }
 
+    @GetMapping(value = "", produces = "application/json")
+    public ResponseEntity<String> Get() {
+        return ResponseEntity.ok("This  is a little method");
+    }
+
     // Always return dto, verify if this is necessary
-    @GetMapping(produces = "application/json")
+    @GetMapping(value = "/{id}", produces = "application/json")
     public ResponseEntity<?> getAllEmployee(@PathVariable Long id) {
         ResponseEntity<?> response = null;
 
@@ -51,16 +57,16 @@ public class EmployeeController {
         }
         catch (Exception e) {
             logger.error("System Error: " + e.getMessage());
-            response = new ResponseEntity<>(employee, HttpStatus.INTERNAL_SERVER_ERROR);
+            response = new ResponseEntity<>("This is the main purpose", HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return response;
     }
 
-    @GetMapping(path = "/{id}")
-    public ResponseEntity<?> getAddress(@PathVariable Long id, @RequestHeader Long user_id) {
+    @GetMapping(value = "/address/{employeeId}", produces = "application/json")
+    public ResponseEntity<?> getAddress(@PathVariable Long employeeId, @RequestHeader Long user_id) {
         ResponseEntity<Address> response = null;
         try {
-            if(null == id) {
+            if(null == employeeId) {
                 throw new InvalidInputException("Employee id is not valid");
             }
 
@@ -68,7 +74,7 @@ public class EmployeeController {
                 throw new UnauthorizedException("Unauthorized user.");
             }
 
-            address = employeeRepository.getByAddress(id);
+            address = employeeRepository.getByAddress(employeeId);
             response = new ResponseEntity<>(address, HttpStatus.OK);
 
         }catch (UnauthorizedException e) {
