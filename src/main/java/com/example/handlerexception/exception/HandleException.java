@@ -1,5 +1,7 @@
 package com.example.handlerexception.exception;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -9,6 +11,12 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
 public class HandleException {
+
+    @Data
+    @AllArgsConstructor
+    private class JsonResponse {
+        private String message;
+    }
 
     Logger logger = LoggerFactory.getLogger(HandleException.class);
 
@@ -33,6 +41,6 @@ public class HandleException {
     @ExceptionHandler(value = { Exception.class })
     public ResponseEntity<?> handlerException(Exception e) {
         logger.error("Exception General : " + e.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new JsonResponse(e.getMessage()));
     }
 }
