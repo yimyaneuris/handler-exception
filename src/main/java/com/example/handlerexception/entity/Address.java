@@ -1,13 +1,11 @@
 package com.example.handlerexception.entity;
 
-import lombok.*;
+import lombok.Data;
 
 import javax.persistence.*;
 
 @Entity
-@Getter
-@Setter
-@RequiredArgsConstructor
+@Data
 public class Address {
 
     @Id
